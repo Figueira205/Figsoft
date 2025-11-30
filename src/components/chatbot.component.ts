@@ -115,11 +115,11 @@ export class ChatbotComponent {
 
   constructor() {
     let key = '';
-    try {
-      key = process.env['API_KEY'] || '';
-    } catch (e) {
-      console.warn('API Key not found or process not defined');
+    // Safe check for process.env in browser environments
+    if (typeof process !== 'undefined' && process.env && process.env['API_KEY']) {
+      key = process.env['API_KEY'];
     }
+    
     this.ai = new GoogleGenAI({ apiKey: key });
     this.initializeChat();
     
@@ -162,7 +162,7 @@ export class ChatbotComponent {
         config: { systemInstruction }
       });
     } catch (e) {
-      console.error("Failed to init chat", e);
+      console.warn("Chat unavailable (missing API Key or network error)", e);
     }
   }
 
@@ -172,7 +172,18 @@ export class ChatbotComponent {
   }
 
   async sendMessage() {
-    if (!this.userInput.trim() || !this.chatSession) return;
+    if (!this.userInput.trim()) return;
+    
+    // Visual feedback only if chat isn't initialized properly
+    if (!this.chatSession) {
+       const userText = this.userInput;
+       this.userInput = '';
+       this.messages.update(m => [...m, { role: 'user', text: userText }]);
+       setTimeout(() => {
+         this.messages.update(m => [...m, { role: 'model', text: 'Lo siento, no puedo conectarme al servidor de IA en este momento (API Key missing).' }]);
+       }, 500);
+       return;
+    }
 
     const userText = this.userInput;
     this.userInput = '';
