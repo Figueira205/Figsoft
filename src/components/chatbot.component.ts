@@ -114,7 +114,13 @@ export class ChatbotComponent {
   private ai: GoogleGenAI;
 
   constructor() {
-    this.ai = new GoogleGenAI({ apiKey: process.env['API_KEY'] || '' });
+    let key = '';
+    try {
+      key = process.env['API_KEY'] || '';
+    } catch (e) {
+      console.warn('API Key not found or process not defined');
+    }
+    this.ai = new GoogleGenAI({ apiKey: key });
     this.initializeChat();
     
     // Add welcome message
