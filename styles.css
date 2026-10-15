@@ -182,7 +182,7 @@ body::before { content: ""; position: fixed; inset: 0; z-index: -1; background:
 }
 @media (max-width: 760px) {
   .burger { display: block; }
-  .nav__links { position: fixed; inset: 64px 1rem auto 1rem; flex-direction: column; gap: 0; background: rgb(11 16 32 / .96); backdrop-filter: blur(18px); border: 1px solid var(--line); border-radius: var(--radius); padding: .5rem; margin: 0; opacity: 0; pointer-events: none; translate: 0 -8px; transition: opacity .3s, translate .3s var(--ease); }
+  .nav__links { position: fixed; inset: 64px 1rem auto 1rem; flex-direction: column; gap: 0; background: #0b1020; backdrop-filter: blur(18px); border: 1px solid var(--line); border-radius: var(--radius); padding: .5rem; margin: 0; opacity: 0; pointer-events: none; translate: 0 -8px; transition: opacity .3s, translate .3s var(--ease); }
   .nav__links.is-open { opacity: 1; pointer-events: auto; translate: 0 0; }
   .nav__links a { padding: .9rem 1rem; font-size: 1.05rem; }
   .nav__tools .btn { display: none; }
