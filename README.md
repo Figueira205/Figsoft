@@ -37,7 +37,7 @@ Una página única que presenta a Figsoft: qué servicios ofrece, cómo trabaja,
 
 | Característica | Detalle |
 |---|---|
-| Escena 3D | El isotipo del logotipo modelado en three.js, con núcleo luminoso, órbitas y bloom, coreografiado sección a sección con el scroll |
+| Escena 3D | El isotipo del logotipo modelado en three.js, con órbitas y bloom, coreografiado sección a sección con el scroll |
 | Idiomas | Español e inglés con un botón; recuerda la elección |
 | Adaptación | Escritorio, tableta y móvil, con menú propio en pantallas pequeñas |
 | Peso | Sin framework; three.js se carga desde una CDN y solo para la escena |
@@ -126,7 +126,6 @@ El isotipo no es una imagen: se modela en código como un objeto físico, pieza 
 ```mermaid
 flowchart TB
   S["Escena three.js"] --> M["Isotipo<br/>6 piezas biseladas"]
-  S --> C["Núcleo<br/>cubo de tres tonos"]
   S --> O["Órbitas<br/>3 anillos con paquetes de datos"]
   S --> L["Luces y entorno<br/>estudio con tiras de luz"]
   S --> P["Postproceso<br/>bloom solo en lo emisivo"]
@@ -141,11 +140,10 @@ flowchart TB
 | Piezas | Seis trapecios extruidos, uno por lado del hexágono, con color del logotipo (azul, verde y azul marino). Cada una tiene bisel redondeado de 7 segmentos y una holgura mínima con sus vecinas, como piezas ensambladas |
 | Materiales | Barniz de coche: capa transparente (`clearcoat`) sobre pintura ligeramente metálica. Los paneles incrustados son satinados, para que el contraste brillo / mate dibuje la forma |
 | Detalle | Paneles incrustados delante y detrás, dos tornillos por pieza con hueco hexagonal y tiras de luz en las caras exterior e interior |
-| Núcleo | Cubo isométrico con las tres caras del logotipo en azul, verde y azul marino, con borde y halo. Su silueta es la del hueco del logotipo |
 | Pulso de datos | Una onda de luz recorre las seis tiras, una pieza tras otra, como una señal que da la vuelta al anillo |
 | Órbitas | Tres anillos inclinados con paquetes de luz que los recorren a distinta velocidad |
 | Entorno | Un estudio generado en código con tiras de luz blancas, azules y verdes que se reflejan con nitidez en el barniz |
-| Postproceso | `UnrealBloomPass` con umbral alto: solo brillan las tiras, el núcleo y los paquetes, no las superficies |
+| Postproceso | `UnrealBloomPass` con umbral alto: solo brillan las tiras y los paquetes, no las superficies |
 | Suelo | Un disco de luz bajo el objeto lo asienta en la escena |
 
 ### Coreografía con el scroll
@@ -154,9 +152,9 @@ El objeto no gira sin rumbo: cada sección tiene una **pose** (posición, escala
 
 | Sección | Qué hace el objeto |
 |---|---|
-| Portada | Llega por piezas desde fuera y encaja. Queda ensamblado, de tres cuartos, y reacciona al ratón con una inclinación contenida |
-| Servicios | Se **abre**: las piezas se separan en su dirección radial y se escalonan en profundidad |
-| Método | Pasa a la **izquierda**, bajo el titular, y gira 60° con cada una de las cuatro fases, sincronizado con la línea de progreso. Al terminar completa la vuelta |
+| Portada | Las seis piezas llegan una a una, girando desde su lado, y encajan con un leve rebote y un destello en la tira de luz. El centro queda vacío, como en el logotipo. Reacciona al ratón con una inclinación contenida |
+| Servicios | Se **abre**: las piezas se separan en su dirección radial y se escalonan en profundidad, como una escalera |
+| Método | Pasa a la **izquierda**, bajo el titular, y gira 60° con cada una de las cuatro fases, sincronizado con la línea de progreso. Cada paso lo mueve un muelle que asienta con un pequeño rebote. Al terminar completa la vuelta |
 | Casos de uso | Se recoge junto al titular y las órbitas toman protagonismo |
 | Tecnología y equipo | Vuelve a la derecha, ensamblado y más pequeño |
 | Contacto | Regresa a la izquierda y se cierra frente a la cámara |

@@ -1,6 +1,6 @@
 // Escena 3D de Figsoft.
 // El isotipo del logotipo se modela como un objeto físico: seis piezas biseladas con paneles,
-// tornillos y tiras de luz, y un núcleo de cristal en el centro. Alrededor, órbitas con paquetes
+// tornillos y tiras de luz. El centro queda vacío, como en el logotipo. Alrededor, órbitas con paquetes
 // de datos. El scroll no lo "da vueltas": lo coreografía, de pieza en pieza, con cada sección.
 import * as THREE from "three";
 import { EffectComposer } from "three/addons/postprocessing/EffectComposer.js";
@@ -16,6 +16,7 @@ const R = 1.32, r = 0.66, DEPTH = 0.58;
 
 const clamp = (v, a, b) => Math.min(b, Math.max(a, v));
 const lerp = (a, b, t) => a + (b - a) * t;
+const easeOutBack = (t) => 1 + 2.2 * Math.pow(t - 1, 3) + 1.2 * Math.pow(t - 1, 2);
 const ease = (t) => (t < 0.5 ? 4 * t * t * t : 1 - Math.pow(-2 * t + 2, 3) / 2);
 const damp = (a, b, k, dt) => lerp(a, b, 1 - Math.exp(-k * dt));
 
@@ -129,29 +130,6 @@ function buildMark() {
   return { rig, segs };
 }
 
-// Núcleo: un cubo isométrico con las tres caras del logotipo (azul, verde y azul marino) que brillan.
-function buildCore() {
-  const g = new THREE.Group();
-  const face = (c, k) => new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), toneMapped: false });
-  // Orden de caras de BoxGeometry: +x, -x, +y, -y, +z, -z
-  const mats = [face(GREEN, 1.7), face(NAVY, 1.1), face(BLUE, 2.4), face(NAVY, 0.8), face(BLUE, 1.5), face(GREEN, 0.9)];
-  const cube = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.5, 0.5), mats);
-  const edges = new THREE.LineSegments(new THREE.EdgesGeometry(new THREE.BoxGeometry(0.5, 0.5, 0.5)), new THREE.LineBasicMaterial({ color: 0xdcecff, transparent: true, opacity: 0.8 }));
-  const halo = new THREE.Sprite(new THREE.SpriteMaterial({ map: haloTex(), color: 0x4aa2ff, transparent: true, opacity: 0.55, depthWrite: false, blending: THREE.AdditiveBlending }));
-  halo.scale.setScalar(1.7);
-  const spin = new THREE.Group(); spin.add(cube, edges);
-  spin.rotation.set(Math.atan(1 / Math.SQRT2), Math.PI / 4, 0);
-  g.add(spin, halo);
-  return { group: g, spin, inner: cube, halo };
-}
-function haloTex() {
-  const c = document.createElement("canvas"); c.width = c.height = 128;
-  const g = c.getContext("2d"), gr = g.createRadialGradient(64, 64, 0, 64, 64, 64);
-  gr.addColorStop(0, "rgba(255,255,255,.9)"); gr.addColorStop(0.3, "rgba(255,255,255,.25)"); gr.addColorStop(1, "rgba(255,255,255,0)");
-  g.fillStyle = gr; g.fillRect(0, 0, 128, 128);
-  return new THREE.CanvasTexture(c);
-}
-
 // Órbitas con paquetes de datos que las recorren
 function buildOrbits(sprite) {
   const group = new THREE.Group();
@@ -221,9 +199,8 @@ export function initScene(canvas, { reduced }) {
   const sprite = softSprite();
   const world = new THREE.Group(); scene.add(world);
   const { rig: markRig, segs } = buildMark();
-  const core = buildCore();
-  const orbits = buildOrbits(sprite);
-  const body = new THREE.Group(); body.add(markRig, core.group);
+    const orbits = buildOrbits(sprite);
+  const body = new THREE.Group(); body.add(markRig);
   world.add(body, orbits.group);
   scene.add(buildDust(mobile ? 280 : 520, sprite));
 
@@ -265,7 +242,7 @@ export function initScene(canvas, { reduced }) {
   ] : [
     //  x     y    esc  expl  rotY   rotX   rotZ  órbitas dim
     D(3.05, 0.05, 1.0, 0, -0.3, 0.1, 0, 1, 1),         // portada: ensamblado, de tres cuartos
-    D(2.75, 0.5, 0.72, 0.9, -0.5, 0.2, 0.08, 0.8, 0.95), // servicios: se abre, una pieza por área
+    D(2.75, 0.5, 0.72, 0.55, -0.5, 0.2, 0.08, 0.8, 0.95), // servicios: se abre, una pieza por área
     D(-3.2, -1.75, 0.66, 0.12, 0.1, 0.1, 0, 0.6, 0.95),  // método: pasa a la izquierda, bajo el titular, y gira a pasos
     D(3.0, 1.35, 0.52, 0.5, 0.4, 0.14, 0, 1, 0.95),     // casos de uso: ocupa el hueco junto al titular
     D(3.2, 0.2, 0.74, 0, -0.25, 0.12, 0, 0.7, 0.85),    // tecnología
@@ -292,43 +269,41 @@ export function initScene(canvas, { reduced }) {
     const p = clamp((innerHeight * 0.62 - rc.top) / rc.height, 0, 1);
     stepRot.target = rc.bottom < innerHeight * 0.4 ? Math.PI * 2 : Math.min(3, Math.floor(p * 4 + 0.001)) * (Math.PI / 3);
   }
-  const stepRot = { v: 0, target: 0 };
+  const stepRot = { v: 0, vel: 0, target: 0 };
 
   const clock = new THREE.Clock();
-  let intro = reduced ? 1 : 0, running = true, raf = 0;
+  let intro = reduced ? 1 : 0, introT = reduced ? 9 : 0, running = true, raf = 0;
   const camBase = new THREE.Vector3();
   const pulse = (u) => Math.pow(Math.max(0, 1 - Math.abs(u) * 2.4), 3);
 
   function frame() {
     const dt = Math.min(clock.getDelta(), 0.05), t = clock.elapsedTime;
-    intro = Math.min(1, intro + dt / 2.4);
+    introT = reduced ? 9 : introT + dt;
+    intro = Math.min(1, introT / 2.8);
     const e = 1 - Math.pow(1 - intro, 4);
     computeTarget();
     const k = reduced ? 1 : 3.2;
     for (const key of Object.keys(pose)) pose[key] = reduced ? target[key] : damp(pose[key], target[key], k, dt);
-    stepRot.v = damp(stepRot.v, stepRot.target, 3.4, dt);
+    // muelle ligeramente subamortiguado: cada paso asienta con un pequeño rebote
+    stepRot.vel += ((stepRot.target - stepRot.v) * 38 - stepRot.vel * 9) * dt; stepRot.v += stepRot.vel * dt;
     mouse.sx = damp(mouse.sx, mouse.x, 3, dt); mouse.sy = damp(mouse.sy, mouse.y, 3, dt);
 
-    // Ensamblado de entrada: las piezas llegan desde fuera y encajan
-    const explode = pose.ex + (1 - e) * 1.6;
+    // Ensamblado de entrada: seis piezas, escalonadas, cada una llega girando desde su lado y encaja con un leve rebote
     segs.forEach((s, i) => {
-      const d = s.userData.dir, stagger = (i % 2 ? 1 : -1) * 0.5;
-      const local = clamp(explode, 0, 3);
-      s.position.set(d.x * local * 0.85, d.y * local * 0.85, stagger * local * 0.28);
-      s.rotation.z = (i % 2 ? 1 : -1) * local * 0.06;
-      // pulso de luz que recorre el anillo
-      const u = ((t * 0.55 - i / 6) % 1 + 1) % 1;
-      const amp = 0.4 + 1.9 * pulse(u > 0.5 ? u - 1 : u);
+      const d = s.userData.dir;
+      const p = clamp((introT - 0.25 - i * 0.2) / 1.1, 0, 1), o = 1 - easeOutBack(p);
+      const local = pose.ex + o * 3.4;
+      s.position.set(d.x * local * 0.85, d.y * local * 0.85, (i - 2.5) * 0.12 * pose.ex - o * 1.4);
+      s.rotation.set(o * (i % 2 ? 0.5 : -0.5), o * 0.4, o * (i % 2 ? 1.1 : -1.1));
+      s.scale.setScalar(lerp(0.6, 1, clamp(p * 2, 0, 1)));
+      // destello al encajar + pulso de luz que recorre el anillo después
+      const flash = Math.exp(-Math.max(0, introT - (0.25 + i * 0.2 + 1.1)) * 3.5) * (p >= 1 ? 1 : 0);
+      const u = ((t * 0.5 - i / 6) % 1 + 1) % 1;
+      const amp = 0.35 + 1.7 * pulse(u > 0.5 ? u - 1 : u) + 2.2 * flash;
       for (const st of s.userData.strips) st.material.color.set(GLOW[i]).multiplyScalar(amp);
     });
-    core.spin.rotation.y = Math.PI / 4 + t * 0.35;
-    core.spin.rotation.x = Math.atan(1 / Math.SQRT2) + Math.sin(t * 0.7) * 0.12;
-    core.inner.scale.setScalar(1 + Math.sin(t * 2.2) * 0.06); core.halo.material.opacity = 0.4 + Math.sin(t * 2.2) * 0.12;
-    core.group.position.z = (1 - e) * -2;
-    core.group.scale.setScalar(lerp(0.0001, 1, clamp(e * 1.4 - 0.2, 0, 1)));
-
-    const sway = Math.sin(t * 0.45) * 0.05;
-    body.position.set(pose.x * (1 - (1 - e) * 0.1), pose.y + Math.sin(t * 0.9) * 0.07 + (1 - e) * -0.6, (1 - e) * -3);
+    const sway = 0;
+    body.position.set(pose.x * (1 - (1 - e) * 0.1), pose.y + Math.sin(t * 0.8) * 0.035 + (1 - e) * -0.4, (1 - e) * -3);
     body.scale.setScalar(pose.s * lerp(0.85, 1, e));
     body.rotation.set(pose.rx + mouse.sy * 0.22 + sway * 0.6, pose.ry + mouse.sx * 0.38 + sway, pose.rz);
     markRig.rotation.z = stepRot.v;
