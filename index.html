@@ -1,83 +1,247 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Figsoft - Automatización Inteligente</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
-  <!-- Dynamic Base HREF for GitHub Pages / Subdirectory deployment -->
-  <script>
-    document.write('<base href="' + (document.location.pathname.replace(/index\.html$/, '') || '/') + '" />');
-  </script>
-
-  <script src="https://cdn.tailwindcss.com"></script>
-  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-  <script>
-    tailwind.config = {
-      theme: {
-        extend: {
-          fontFamily: {
-            sans: ['Inter', 'sans-serif'],
-          },
-          colors: {
-            fig: {
-              dark: '#0B0F19',
-              blue: '#007BFF',
-              green: '#00E599',
-              darkblue: '#1e293b'
-            }
-          },
-          animation: {
-            'float': 'float 6s ease-in-out infinite',
-            'pulse-glow': 'pulse-glow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-          },
-          keyframes: {
-            float: {
-              '0%, 100%': { transform: 'translateY(0)' },
-              '50%': { transform: 'translateY(-20px)' },
-            },
-            'pulse-glow': {
-              '0%, 100%': { opacity: 1, boxShadow: '0 0 20px #00E599' },
-              '50%': { opacity: .5, boxShadow: '0 0 10px #00E599' },
-            }
-          }
-        }
-      }
-    }
-  </script>
-  <style>
-    body { background-color: #0B0F19; color: white; }
-    .glass-panel {
-      background: rgba(30, 41, 59, 0.4);
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.1);
-    }
-    .neon-text {
-      text-shadow: 0 0 10px rgba(0, 229, 153, 0.5);
-    }
-    html { scroll-behavior: smooth; }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Figsoft · Consultoría IT y automatización</title>
+<meta name="description" content="Figsoft es una consultora informática de Madrid: desarrollo web, automatización de procesos, inteligencia artificial y software a medida para empresas de cualquier tamaño.">
+<meta name="theme-color" content="#070a14">
+<link rel="icon" type="image/png" href="assets/favicon.png">
+<link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+<meta property="og:type" content="website">
+<meta property="og:title" content="Figsoft · Consultoría IT y automatización">
+<meta property="og:description" content="Desarrollo web, automatización, IA y software a medida para empresas.">
+<meta property="og:image" content="https://figueira205.github.io/Figsoft/docs/preview.jpg">
+<meta property="og:url" content="https://figueira205.github.io/Figsoft/">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600&family=JetBrains+Mono:wght@400;500&family=Outfit:wght@500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="styles.css">
 <script type="importmap">
-{
-  "imports": {
-    "rxjs": "https://aistudiocdn.com/rxjs@^7.8.2?conditions=es2015",
-    "rxjs/operators": "https://aistudiocdn.com/rxjs@^7.8.2/operators?conditions=es2015",
-    "rxjs/ajax": "https://aistudiocdn.com/rxjs@^7.8.2/ajax?conditions=es2015",
-    "rxjs/webSocket": "https://aistudiocdn.com/rxjs@^7.8.2/webSocket?conditions=es2015",
-    "rxjs/testing": "https://aistudiocdn.com/rxjs@^7.8.2/testing?conditions=es2015",
-    "rxjs/fetch": "https://aistudiocdn.com/rxjs@^7.8.2/fetch?conditions=es2015",
-    "@angular/compiler": "https://next.esm.sh/@angular/compiler@^21.0.1?external=rxjs",
-    "@angular/platform-browser": "https://next.esm.sh/@angular/platform-browser@^21.0.1?external=rxjs",
-    "@google/genai": "https://next.esm.sh/@google/genai@^1.30.0?external=rxjs",
-    "@angular/core": "https://next.esm.sh/@angular/core@^21.0.1?external=rxjs",
-    "@angular/forms": "https://next.esm.sh/@angular/forms@^21.0.1?external=rxjs",
-    "@angular/common": "https://next.esm.sh/@angular/common@^21.0.1?external=rxjs"
-  }
-}
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.170.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.170.0/examples/jsm/"
+} }
+</script>
+<script type="application/ld+json">
+{ "@context": "https://schema.org", "@type": "ProfessionalService", "name": "Figsoft",
+  "description": "Consultoría IT, desarrollo web, automatización e inteligencia artificial.",
+  "url": "https://figueira205.github.io/Figsoft/", "email": "figueira205@proton.me",
+  "address": { "@type": "PostalAddress", "addressLocality": "Torrejón de Ardoz", "addressRegion": "Madrid", "addressCountry": "ES" },
+  "founder": { "@type": "Person", "name": "Jose Figueira" } }
 </script>
 </head>
 <body>
-  <app-root></app-root>
+<a class="skip" href="#main" data-i18n="skip">Saltar al contenido</a>
+<canvas id="stage" aria-hidden="true"></canvas>
+
+<header class="nav" id="nav">
+  <a class="nav__brand" href="#top" aria-label="Figsoft, inicio"><img src="assets/logo.webp" alt="Figsoft" width="640" height="180"></a>
+  <nav class="nav__links" id="menu" aria-label="Principal">
+    <a href="#servicios" data-i18n="nav.services">Servicios</a>
+    <a href="#metodo" data-i18n="nav.method">Método</a>
+    <a href="#proyectos" data-i18n="nav.projects">Proyectos</a>
+    <a href="#equipo" data-i18n="nav.team">Equipo</a>
+    <a href="#contacto" data-i18n="nav.contact">Contacto</a>
+  </nav>
+  <div class="nav__tools">
+    <button class="lang" id="lang" type="button" aria-label="Cambiar idioma"><span class="is-on" data-l="es">ES</span><span data-l="en">EN</span></button>
+    <a class="btn btn--sm" href="#contacto" data-i18n="nav.cta">Hablemos</a>
+    <button class="burger" id="burger" type="button" aria-expanded="false" aria-controls="menu" aria-label="Abrir menú"><span></span><span></span></button>
+  </div>
+</header>
+
+<main id="main">
+<section class="hero" id="top">
+  <div class="wrap hero__grid">
+    <div class="hero__copy">
+      <p class="eyebrow"><span class="dot"></span><span data-i18n="hero.eyebrow">Consultoría IT · Madrid</span></p>
+      <h1 class="hero__title">
+        <span class="line"><span data-i18n="hero.l1">Software, IA y</span></span>
+        <span class="line"><span class="grad" data-i18n="hero.l2">automatización</span></span>
+        <span class="line"><span data-i18n="hero.l3">a la medida de tu empresa.</span></span>
+      </h1>
+      <p class="hero__lead" data-i18n="hero.lead">Creamos sitios web, automatizamos procesos y conectamos tus herramientas con inteligencia artificial, para que tu equipo dedique el tiempo a lo que importa.</p>
+      <div class="hero__cta">
+        <a class="btn" href="#contacto" data-magnetic data-i18n="hero.cta1">Solicitar presupuesto</a>
+        <a class="btn btn--ghost" href="#servicios" data-magnetic data-i18n="hero.cta2">Ver servicios</a>
+      </div>
+    </div>
+    <ul class="stats" aria-label="Cifras">
+      <li><b data-count="40" data-suffix="+">40+</b><span data-i18n="stats.projects">proyectos entregados</span></li>
+      <li><b data-count="16">16</b><span data-i18n="stats.sectors">sectores atendidos</span></li>
+      <li><b>ES · EN</b><span data-i18n="stats.lang">atención en dos idiomas</span></li>
+    </ul>
+  </div>
+  <a class="scrollhint" href="#servicios" aria-label="Bajar"><span></span></a>
+</section>
+
+<section class="sector-strip" aria-label="Sectores">
+  <div class="marquee"><div class="marquee__track" id="sectors"></div></div>
+</section>
+
+<section class="sec" id="servicios">
+  <div class="wrap">
+    <header class="sec__head">
+      <p class="kicker" data-i18n="svc.kicker">Qué hacemos</p>
+      <h2 data-i18n="svc.title">Todo lo que tu empresa necesita para trabajar mejor con tecnología</h2>
+    </header>
+    <div class="cards">
+      <article class="card" data-tilt>
+        <span class="card__n">01</span>
+        <h3 data-i18n="svc.1t">Automatización de procesos</h3>
+        <p data-i18n="svc.1d">Conectamos tus herramientas con n8n, Make y APIs para eliminar tareas repetitivas: facturas, avisos, altas, informes.</p>
+        <ul class="tags"><li>n8n</li><li>Make</li><li>APIs</li></ul>
+      </article>
+      <article class="card" data-tilt>
+        <span class="card__n">02</span>
+        <h3 data-i18n="svc.2t">Inteligencia artificial</h3>
+        <p data-i18n="svc.2d">Agentes y modelos de lenguaje integrados en tus flujos: clasificar documentos, responder consultas y apoyar decisiones.</p>
+        <ul class="tags"><li>LLM</li><li>Gemini</li><li>Agentes</li></ul>
+      </article>
+      <article class="card" data-tilt>
+        <span class="card__n">03</span>
+        <h3 data-i18n="svc.3t">Desarrollo web y e-commerce</h3>
+        <p data-i18n="svc.3d">Webs corporativas, tiendas online y plataformas con pagos, rápidas, accesibles y listas para posicionar.</p>
+        <ul class="tags"><li>React</li><li>Vue</li><li>WooCommerce</li></ul>
+      </article>
+      <article class="card" data-tilt>
+        <span class="card__n">04</span>
+        <h3 data-i18n="svc.4t">Software a medida</h3>
+        <p data-i18n="svc.4d">Aplicaciones internas, paneles y servicios que encajan con tu forma de trabajar, con una base técnica que se puede mantener.</p>
+        <ul class="tags"><li>TypeScript</li><li>Node</li><li>PostgreSQL</li></ul>
+      </article>
+      <article class="card" data-tilt>
+        <span class="card__n">05</span>
+        <h3 data-i18n="svc.5t">Odoo y ERP</h3>
+        <p data-i18n="svc.5d">Módulos, temas e integraciones a medida para que el ERP refleje tus procesos y no al revés.</p>
+        <ul class="tags"><li>Odoo</li><li>Python</li><li>XML-RPC</li></ul>
+      </article>
+      <article class="card" data-tilt>
+        <span class="card__n">06</span>
+        <h3 data-i18n="svc.6t">Consultoría IT</h3>
+        <p data-i18n="svc.6d">Evaluación técnica y estratégica para ordenar tu infraestructura, priorizar inversiones y modernizar sin parar el negocio.</p>
+        <ul class="tags"><li>Auditoría</li><li>Arquitectura</li><li>Hoja de ruta</li></ul>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt" id="metodo">
+  <div class="wrap method">
+    <header class="sec__head method__head">
+      <p class="kicker" data-i18n="met.kicker">Cómo trabajamos</p>
+      <h2 data-i18n="met.title">Un método simple, de la primera conversación a la mejora continua</h2>
+      <p class="muted" data-i18n="met.lead">Sin jerga ni promesas vagas: cada fase termina con algo que puedes ver, probar y medir.</p>
+    </header>
+    <ol class="steps" id="steps">
+      <li><span class="steps__n">1</span><h3 data-i18n="met.1t">Diagnóstico</h3><p data-i18n="met.1d">Escuchamos tu caso, revisamos tus herramientas y detectamos dónde se pierde más tiempo. Evaluación inicial gratuita.</p></li>
+      <li><span class="steps__n">2</span><h3 data-i18n="met.2t">Diseño de la solución</h3><p data-i18n="met.2d">Proponemos una solución concreta con alcance, plazos y presupuesto cerrado antes de escribir una línea.</p></li>
+      <li><span class="steps__n">3</span><h3 data-i18n="met.3t">Construcción por entregas</h3><p data-i18n="met.3d">Entregas cortas y funcionales. Ves avances reales cada semana y ajustamos sobre la marcha.</p></li>
+      <li><span class="steps__n">4</span><h3 data-i18n="met.4t">Puesta en marcha y mejora</h3><p data-i18n="met.4d">Desplegamos, formamos a tu equipo y seguimos midiendo para mejorar lo que ya funciona.</p></li>
+    </ol>
+  </div>
+</section>
+
+<section class="sec" id="proyectos">
+  <div class="wrap">
+    <header class="sec__head">
+      <p class="kicker" data-i18n="prj.kicker">Casos de uso</p>
+      <h2 data-i18n="prj.title">Innovación aplicada a escenarios reales</h2>
+    </header>
+    <div class="projects">
+      <article class="project project--lg" data-spot>
+        <span class="project__tag" data-i18n="prj.t1">Legal · IA</span>
+        <h3 data-i18n="prj.1t">Validación legal automatizada</h3>
+        <p data-i18n="prj.1d">Sistema para despachos que clasifica, lee y valida documentación legal de forma automática, y deja al abogado solo lo que requiere criterio.</p>
+      </article>
+      <article class="project" data-spot>
+        <span class="project__tag" data-i18n="prj.t2">Logística · IA</span>
+        <h3 data-i18n="prj.2t">CRM logístico con IA</h3>
+        <p data-i18n="prj.2d">Gestión de flotas que anticipa mantenimientos y optimiza rutas con aprendizaje automático.</p>
+      </article>
+      <article class="project" data-spot>
+        <span class="project__tag" data-i18n="prj.t3">Administración pública</span>
+        <h3 data-i18n="prj.3t">Chatbot de atención ciudadana</h3>
+        <p data-i18n="prj.3d">Asistente virtual que gestiona citas y resuelve dudas sobre trámites.</p>
+      </article>
+      <article class="project" data-spot>
+        <span class="project__tag" data-i18n="prj.t4">Farma · Visión artificial</span>
+        <h3 data-i18n="prj.4t">Control de stock farmacéutico</h3>
+        <p data-i18n="prj.4d">Visión artificial para controlar inventario y caducidades en grandes almacenes.</p>
+      </article>
+      <article class="project" data-spot>
+        <span class="project__tag" data-i18n="prj.t5">Fintech · Datos</span>
+        <h3 data-i18n="prj.5t">Detección de fraude en tiempo real</h3>
+        <p data-i18n="prj.5d">Motor de análisis transaccional que detecta patrones anómalos en banca digital mientras ocurren.</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt" id="stack">
+  <div class="wrap">
+    <header class="sec__head">
+      <p class="kicker" data-i18n="stk.kicker">Tecnología</p>
+      <h2 data-i18n="stk.title">Herramientas que dominamos</h2>
+    </header>
+    <ul class="chips" id="chips"></ul>
+  </div>
+</section>
+
+<section class="sec" id="equipo">
+  <div class="wrap team">
+    <header class="sec__head">
+      <p class="kicker" data-i18n="team.kicker">Equipo</p>
+      <h2 data-i18n="team.title">Una startup unida y apasionada por la tecnología</h2>
+      <p class="muted" data-i18n="team.lead">Más de 40 proyectos a nuestras espaldas y un trato directo con quien construye tu solución.</p>
+    </header>
+    <div class="people">
+      <article class="person" data-tilt>
+        <span class="person__mono">JF</span>
+        <h3>Jose Figueira</h3>
+        <p data-i18n="team.ceo">Fundador y CEO</p>
+      </article>
+      <article class="person" data-tilt>
+        <span class="person__mono person__mono--g">JP</span>
+        <h3>Jose Padrón</h3>
+        <p data-i18n="team.cvo">Chief Visionary Officer</p>
+      </article>
+    </div>
+  </div>
+</section>
+
+<section class="sec sec--alt contact" id="contacto">
+  <div class="wrap contact__grid">
+    <div>
+      <p class="kicker" data-i18n="ct.kicker">Contacto</p>
+      <h2 data-i18n="ct.title">Cuéntanos tu proyecto</h2>
+      <p class="muted" data-i18n="ct.lead">Te respondemos con una evaluación gratuita y una propuesta clara.</p>
+      <ul class="reach">
+        <li><span data-i18n="ct.mail">Correo</span><a href="mailto:figueira205@proton.me">figueira205@proton.me</a></li>
+        <li><span data-i18n="ct.phone">Teléfono</span><div><a href="tel:+34641657157">641 657 157</a> · <a href="tel:+34641228929">641 228 929</a></div></li>
+        <li><span data-i18n="ct.place">Ubicación</span><div>Madrid · Torrejón de Ardoz</div></li>
+      </ul>
+    </div>
+    <form class="form" id="form" novalidate>
+      <label><span data-i18n="ct.name">Nombre</span><input name="name" autocomplete="name" required></label>
+      <label><span data-i18n="ct.email">Correo electrónico</span><input name="email" type="email" autocomplete="email" required></label>
+      <label><span data-i18n="ct.msg">Mensaje</span><textarea name="msg" rows="5" required></textarea></label>
+      <p class="form__err" id="err" role="alert" hidden data-i18n="ct.err">Completa los tres campos con un correo válido.</p>
+      <button class="btn" type="submit" data-i18n="ct.send">Enviar mensaje</button>
+      <p class="form__note" data-i18n="ct.note">Se abrirá tu aplicación de correo con el mensaje preparado.</p>
+    </form>
+  </div>
+</section>
+</main>
+
+<footer class="foot">
+  <div class="wrap foot__in">
+    <img src="assets/logo.webp" alt="Figsoft" width="640" height="180">
+    <p>© <span id="year"></span> Figsoft · <span data-i18n="foot.t">Tecnología inteligente. Soluciones reales. Resultados que importan.</span></p>
+  </div>
+</footer>
+
+<script type="module" src="main.js"></script>
 </body>
 </html>
