@@ -37,7 +37,7 @@ Una página única que presenta a Figsoft: qué servicios ofrece, cómo trabaja,
 
 | Característica | Detalle |
 |---|---|
-| Escena 3D | El isotipo del logotipo en three.js, con red de nodos y partículas que reaccionan al ratón y al scroll |
+| Escena 3D | El isotipo del logotipo modelado en three.js, con núcleo luminoso, órbitas y bloom, coreografiado sección a sección con el scroll |
 | Idiomas | Español e inglés con un botón; recuerda la elección |
 | Adaptación | Escritorio, tableta y móvil, con menú propio en pantallas pequeñas |
 | Peso | Sin framework; three.js se carga desde una CDN y solo para la escena |
@@ -47,7 +47,7 @@ Una página única que presenta a Figsoft: qué servicios ofrece, cómo trabaja,
 
 ### Portada
 
-Titular que entra línea a línea, descripción, dos llamadas a la acción con efecto magnético y tres cifras que se cuentan al cargar. A la derecha, el isotipo en 3D. Debajo, una banda continua con los 16 sectores atendidos; se detiene al pasar el cursor.
+Titular que entra línea a línea, descripción, dos llamadas a la acción con efecto magnético y tres cifras que se cuentan al cargar. A la derecha, el isotipo en 3D, que llega por piezas y encaja. Debajo, una banda continua con los 16 sectores atendidos; se detiene al pasar el cursor.
 
 ### Servicios
 
@@ -117,30 +117,67 @@ flowchart LR
 
 ## Escena 3D
 
-El isotipo no es una imagen: se construye en código con seis piezas hexagonales extruidas, una por lado del hexágono, cada una con su color del logotipo.
+El isotipo no es una imagen: se modela en código como un objeto físico, pieza a pieza, y se anima con una coreografía ligada al scroll.
+
+![Isotipo ensamblado](docs/escena-ensamblado.jpg)
+
+### El modelo
 
 ```mermaid
 flowchart TB
-  S["Escena three.js"] --> M["Isotipo<br/>6 piezas extruidas"]
-  S --> N["Red de nodos<br/>30 cubos y líneas"]
-  S --> P["Partículas<br/>900 puntos"]
-  S --> L["Luces<br/>clave, azul y verde"]
-  I1["Ratón"] --> M
-  I1 --> C["Cámara"]
-  I2["Scroll"] --> M
-  I2 --> O["Opacidad del lienzo"]
+  S["Escena three.js"] --> M["Isotipo<br/>6 piezas biseladas"]
+  S --> C["Núcleo<br/>cubo de tres tonos"]
+  S --> O["Órbitas<br/>3 anillos con paquetes de datos"]
+  S --> L["Luces y entorno<br/>estudio con tiras de luz"]
+  S --> P["Postproceso<br/>bloom solo en lo emisivo"]
+  M --> M1["Cuerpo extruido y biselado"]
+  M --> M2["Paneles satinados delante y detrás"]
+  M --> M3["Tornillos con hueco hexagonal"]
+  M --> M4["Tiras de luz con pulso"]
 ```
 
 | Elemento | Detalle |
 |---|---|
-| Isotipo | Lados azul, verde y azul marino como en el logotipo. Material físico con capa transparente y entorno suave para los reflejos |
-| Red de nodos | 30 cubos translúcidos con borde, unidos por líneas cuando están cerca. Giran y flotan con un desfase propio |
-| Partículas | 900 puntos con mezcla aditiva entre azul y verde |
-| Ratón | Gira el isotipo y desplaza la cámara con suavizado |
-| Scroll | Mueve y aleja el conjunto y baja la opacidad del lienzo para que no compita con el texto |
-| Móvil | Isotipo más pequeño, centrado y con el lienzo atenuado para mantener la lectura |
+| Piezas | Seis trapecios extruidos, uno por lado del hexágono, con color del logotipo (azul, verde y azul marino). Cada una tiene bisel redondeado de 7 segmentos y una holgura mínima con sus vecinas, como piezas ensambladas |
+| Materiales | Barniz de coche: capa transparente (`clearcoat`) sobre pintura ligeramente metálica. Los paneles incrustados son satinados, para que el contraste brillo / mate dibuje la forma |
+| Detalle | Paneles incrustados delante y detrás, dos tornillos por pieza con hueco hexagonal y tiras de luz en las caras exterior e interior |
+| Núcleo | Cubo isométrico con las tres caras del logotipo en azul, verde y azul marino, con borde y halo. Su silueta es la del hueco del logotipo |
+| Pulso de datos | Una onda de luz recorre las seis tiras, una pieza tras otra, como una señal que da la vuelta al anillo |
+| Órbitas | Tres anillos inclinados con paquetes de luz que los recorren a distinta velocidad |
+| Entorno | Un estudio generado en código con tiras de luz blancas, azules y verdes que se reflejan con nitidez en el barniz |
+| Postproceso | `UnrealBloomPass` con umbral alto: solo brillan las tiras, el núcleo y los paquetes, no las superficies |
+| Suelo | Un disco de luz bajo el objeto lo asienta en la escena |
+
+### Coreografía con el scroll
+
+El objeto no gira sin rumbo: cada sección tiene una **pose** (posición, escala, rotación, apertura y órbitas) y el scroll interpola entre una y la siguiente con una curva suave. La pose actual persigue a la pose objetivo con amortiguación, así que el movimiento nunca es brusco.
+
+| Sección | Qué hace el objeto |
+|---|---|
+| Portada | Llega por piezas desde fuera y encaja. Queda ensamblado, de tres cuartos, y reacciona al ratón con una inclinación contenida |
+| Servicios | Se **abre**: las piezas se separan en su dirección radial y se escalonan en profundidad |
+| Método | Pasa a la **izquierda**, bajo el titular, y gira 60° con cada una de las cuatro fases, sincronizado con la línea de progreso. Al terminar completa la vuelta |
+| Casos de uso | Se recoge junto al titular y las órbitas toman protagonismo |
+| Tecnología y equipo | Vuelve a la derecha, ensamblado y más pequeño |
+| Contacto | Regresa a la izquierda y se cierra frente a la cámara |
+
+![Servicios: el objeto se abre](docs/escena-servicios.jpg)
+
+![Método: pasa a la izquierda y gira a pasos](docs/escena-metodo.jpg)
+
+![Contacto: se cierra frente a la cámara](docs/escena-contacto.jpg)
+
+Cuando el objeto cruza la pantalla de un lado al otro se atenúa un 55 %, para no tapar el texto que atraviesa.
+
+### Rendimiento y respaldo
+
+| Aspecto | Solución |
+|---|---|
+| Resolución | Limitada a 1,75x en escritorio y 1,5x en móvil |
 | Pestaña oculta | El bucle de dibujo se detiene |
-| Movimiento reducido | Se dibuja un solo fotograma, sin bucle |
+| Móvil | Objeto centrado arriba, más pequeño y atenuado para mantener la lectura; menos partículas |
+| Movimiento reducido | Se dibuja un fotograma por cada cambio de scroll, sin bucle, sin entrada animada y con la pose exacta de cada sección |
+| Sin WebGL o sin CDN | La escena se omite y la página funciona con el fondo en degradado |
 
 ## Sistema de diseño
 
@@ -167,7 +204,7 @@ Los colores salen del logotipo. Una sola marca, dos acentos y fondos azul marino
   <img src="docs/movil-menu.jpg" alt="Menú en móvil" width="240">
 </p>
 
-Por debajo de 760 px las columnas pasan a una y el menú se convierte en un panel desplegable. El isotipo se centra detrás de la portada, atenuado, y el botón de contacto se retira de la barra porque ya está en el menú y en la portada.
+Por debajo de 760 px las columnas pasan a una y el menú se convierte en un panel desplegable opaco. El isotipo se coloca arriba, centrado y atenuado, y el botón de contacto se retira de la barra porque ya está en el menú y en la portada.
 
 ## Accesibilidad y rendimiento
 
@@ -176,7 +213,7 @@ Por debajo de 760 px las columnas pasan a una y el menú se convierte en un pane
 - La escena 3D es decorativa (`aria-hidden`) y no captura el puntero.
 - Con `prefers-reduced-motion` se desactivan transiciones, la banda de sectores y el bucle 3D.
 - El idioma actualiza el atributo `lang` del documento.
-- Resolución del lienzo limitada a 2x y bucle detenido con la pestaña en segundo plano.
+- Resolución del lienzo limitada y bucle detenido con la pestaña en segundo plano.
 - Metadatos Open Graph y datos estructurados `ProfessionalService` para buscadores y vistas previas.
 
 ## Estructura del repositorio
@@ -228,7 +265,7 @@ La web se publica con **GitHub Pages** desde la rama `main`, carpeta raíz. Cada
 - **Sin noticias.** La sección anterior usaba imágenes de relleno y no tenía contenido detrás.
 - **Formulario por correo.** Sin servidor, el formulario abre el cliente de correo del visitante. Para recibir mensajes sin esa acción habría que conectar un servicio de formularios.
 - **Casos de uso genéricos.** Describen el tipo de solución, no clientes concretos.
-- **Dependencia de una CDN.** three.js se carga desde jsDelivr con versión fija. Si se quiere independencia total, se puede copiar a `assets/` y cambiar el `importmap` de `index.html`.
+- **Dependencia de una CDN.** three.js 0.170 y sus módulos de postprocesado se cargan desde jsDelivr con versión fija (`importmap` de `index.html`). Si se quiere independencia total, se pueden copiar a `assets/` y cambiar las rutas del `importmap`.
 
 ## Historia
 
